@@ -33,11 +33,6 @@ router.put('/header-logo/:id', upload.single('image'), async (req, res) => {
     const update = req.file ? { image: req.file.path } : {};
     res.json(await HeaderLogo.findByIdAndUpdate(req.params.id, update, { new: true }));
 });
-router.get('/header-logo/:id', async (req, res) => {
-    const item = await HeaderLogo.findById(req.params.id);
-    if (!item) return res.status(404).json({ message: 'Not found' });
-    res.json(item);
-});
 router.delete('/header-logo/:id', async (req, res) => {
     await HeaderLogo.findByIdAndDelete(req.params.id);
     res.json({ message: 'Deleted' });

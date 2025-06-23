@@ -9,8 +9,14 @@ const path = require('path');
 const app = express();
 const routes = require('./routes/api');
 
+// ✅ Proper CORS config
+app.use(cors({
+    origin: 'http://localhost:3000', // ✅ Allow React frontend
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
+}));
+
 // ✅ Middleware
-app.use(cors());
 app.use(express.json());
 
 // ✅ Serve uploads folder as static
@@ -31,7 +37,7 @@ app.use('/api', routes);
 // ✅ Debug Mongo URI
 console.log('Mongo URI:', process.env.MONGO_URI);
 
-// ✅ Connect to MongoDB Database
+// ✅ Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,

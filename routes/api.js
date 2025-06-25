@@ -3,7 +3,6 @@ const router = express.Router();
 const multer = require('multer');
 require('dotenv').config();
 
-
 // Models
 const Course = require('../models/Course');
 const Event = require('../models/Event');
@@ -13,6 +12,7 @@ const HeaderHero = require('../models/HeaderHero');
 const OurTeam = require('../models/OurTeam');
 const Partner = require('../models/Partner');
 const TeamImage = require('../models/TeamImage');
+const User = require('../models/User'); // ✅ Added
 
 // Multer Setup
 const storage = multer.diskStorage({
@@ -22,7 +22,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 /* === Header Logo === */
-
 router.post('/header-logo', upload.single('image'), async (req, res) => {
     const item = new HeaderLogo({ image: req.file.path });
     await item.save();
@@ -157,6 +156,27 @@ router.put('/our-team/:id', upload.single('image'), async (req, res) => {
 router.delete('/our-team/:id', async (req, res) => {
     await OurTeam.findByIdAndDelete(req.params.id);
     res.json({ message: 'Deleted' });
+});
+
+/* === Buy Course === */
+router.post('/buy-course/:userId/:courseId', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.userId);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        const courseId = req.params.courseId;
+        if (!user.purchasedCourses.includes(courseId)) {
+            user.purchasedCourses.push(courseId);
+            await user.save();
+        }
+
+        res.json({
+            message: 'Course purchased successfully',
+            purchasedCourses: user.purchasedCourses
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 module.exports = router;

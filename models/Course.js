@@ -5,8 +5,7 @@ const CourseSchema = new mongoose.Schema({
     title: String,
     description: String,
     price: Number,
-    duration: String,
-    buyCourse: String
+    duration: String
 });
 
 module.exports = mongoose.model('Course', CourseSchema);

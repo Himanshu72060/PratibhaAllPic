@@ -44,6 +44,10 @@ router.post('/courses', upload.single('image'), async (req, res) => {
     await item.save();
     res.json(item);
 });
+router.get('/images', async (req, res) => {
+    const courses = await Course.find();
+    res.json([{ images: courses.map(item => item.image) }]);
+});
 router.get('/courses', async (req, res) => res.json(await Course.find()));
 router.put('/courses/:id', upload.single('image'), async (req, res) => {
     const update = req.body;

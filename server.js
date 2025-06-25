@@ -12,7 +12,8 @@ const routes = require('./routes/api');
 // ✅ Allow multiple frontend origins (localhost + deployed)
 const allowedOrigins = [
     'http://localhost:3000',
-    'https://your-frontend.onrender.com' // 🔁 Replace with actual deployed React URL
+    'https://image-api-nmwn.onrender.com', // optional: backend origin
+    'https://your-frontend.onrender.com' // 🔁 replace with your deployed React URL if needed
 ];
 
 app.use(cors({

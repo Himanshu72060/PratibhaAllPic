@@ -39,10 +39,16 @@ router.delete('/header-logo/:id', async (req, res) => {
 
 /* === Courses === */
 router.post('/courses', upload.single('image'), async (req, res) => {
-    const item = new Course({ ...req.body, image: req.file.path });
+    const item = new Course({
+        ...req.body,
+        image: req.file?.path || null,
+        assignmentLink: req.body.assignmentLink,
+        liveClassLink: req.body.liveClassLink
+    });
     await item.save();
     res.json(item);
 });
+
 router.get('/images', async (req, res) => {
     const courses = await Course.find();
     res.json([{ images: courses.map(item => item.image) }]);

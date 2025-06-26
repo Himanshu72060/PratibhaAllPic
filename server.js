@@ -9,13 +9,14 @@ const path = require('path');
 const app = express();
 const routes = require('./routes/api');
 
-// ✅ Allow multiple frontend origins (localhost + deployed)
+// ✅ Allow multiple frontend origins
 const allowedOrigins = [
     'http://localhost:3000',
-    'https://image-api-nmwn.onrender.com', // optional: backend origin
-    'https://your-frontend.onrender.com' // 🔁 replace with your deployed React URL if needed
+    'https://image-api-nmwn.onrender.com',
+    'https://your-frontend.onrender.com' // 🔁 replace this with actual frontend URL
 ];
 
+// ✅ Proper CORS setup
 app.use(cors({
     origin: function (origin, callback) {
         if (!origin || allowedOrigins.includes(origin)) {
@@ -35,7 +36,7 @@ app.use(express.json());
 const uploadsPath = path.join(__dirname, 'uploads');
 app.use('/uploads', express.static(uploadsPath));
 
-// ✅ Ensure uploads directory exists
+// ✅ Ensure uploads folder exists
 if (!fs.existsSync(uploadsPath)) {
     fs.mkdirSync(uploadsPath, { recursive: true });
     console.log("✅ 'uploads' folder created");
@@ -43,13 +44,11 @@ if (!fs.existsSync(uploadsPath)) {
     console.log("✅ 'uploads' folder already exists");
 }
 
-// ✅ API routes
+// ✅ API Routes
 app.use('/api', routes);
 
-// ✅ Debug Mongo URI
+// ✅ MongoDB connection
 console.log('Mongo URI:', process.env.MONGO_URI);
-
-// ✅ Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,

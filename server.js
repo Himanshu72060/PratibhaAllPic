@@ -48,12 +48,9 @@ if (!fs.existsSync(uploadsPath)) {
 app.use('/api', routes);
 
 // ✅ MongoDB connection
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
+mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('✅ MongoDB connected'))
-    .catch(err => console.error('❌ MongoDB Error:', err));
+    .catch(err => console.error('❌ MongoDB Error:', err.message));
 
 // ✅ Start Server
 const PORT = process.env.PORT || 3000;

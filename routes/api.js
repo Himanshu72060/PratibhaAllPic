@@ -14,12 +14,21 @@ const Partner = require('../models/Partner');
 const TeamImage = require('../models/TeamImage');
 const User = require('../models/User'); // ✅ Added
 
-// Multer Setup
+// Multer Setup with filename cleaning
 const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, 'uploads/'),
-    filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
+    filename: (req, file, cb) => {
+        const cleaned = file.originalname.replace(/\s+/g, '-');
+        cb(null, Date.now() + '-' + cleaned);
+    }
 });
 const upload = multer({ storage });
+
+
+// Helper function to build full URL
+const getImageUrl = (req, filePath) => {
+    return `${req.protocol}://${req.get('host')}/${filePath.replace(/\\/g, '/')}`;
+};
 
 /* === Header Logo === */
 router.post('/header-logo', upload.single('image'), async (req, res) => {
@@ -38,30 +47,59 @@ router.delete('/header-logo/:id', async (req, res) => {
 });
 
 /* === Courses === */
+// ✅ POST - Create new course
 router.post('/courses', upload.single('image'), async (req, res) => {
-    const item = new Course({
-        ...req.body,
-        image: req.file?.path || null,
-        assignmentLink: req.body.assignmentLink,
-        liveClassLink: req.body.liveClassLink
-    });
-    await item.save();
-    res.json(item);
+    try {
+        const imageUrl = req.file ? getImageUrl(req, req.file.path) : null;
+
+        const item = new Course({
+            ...req.body,
+            image: imageUrl,
+            assignmentLink: req.body.assignmentLink,
+            liveClassLink: req.body.liveClassLink
+        });
+
+        await item.save();
+        res.json(item);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
-router.get('/images', async (req, res) => {
-    const courses = await Course.find();
-    res.json([{ images: courses.map(item => item.image) }]);
+// ✅ GET - All courses
+router.get('/courses', async (req, res) => {
+    try {
+        const courses = await Course.find();
+        res.json(courses);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
-router.get('/courses', async (req, res) => res.json(await Course.find()));
+
+// ✅ PUT - Update course
 router.put('/courses/:id', upload.single('image'), async (req, res) => {
-    const update = req.body;
-    if (req.file) update.image = req.file.path;
-    res.json(await Course.findByIdAndUpdate(req.params.id, update, { new: true }));
+    try {
+        const update = req.body;
+
+        if (req.file) {
+            update.image = getImageUrl(req, req.file.path);
+        }
+
+        const updated = await Course.findByIdAndUpdate(req.params.id, update, { new: true });
+        res.json(updated);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
+
+// ✅ DELETE - Remove course
 router.delete('/courses/:id', async (req, res) => {
-    await Course.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Deleted' });
+    try {
+        await Course.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Deleted' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 /* === Events === */

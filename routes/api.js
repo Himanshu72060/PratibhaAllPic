@@ -180,7 +180,15 @@ router.post('/team-image', upload.single('image'), async (req, res) => {
     await item.save();
     res.json(item);
 });
-router.get('/team-image', async (req, res) => res.json(await TeamImage.find()));
+router.get('/team-image', async (req, res) => {
+    const items = await TeamImage.find();
+    // Map to include full URL for images
+    const itemsWithFullUrls = items.map(item => ({
+        ...item.toObject(),
+        image: getImageUrl(req, item.image)
+    }));
+    res.json(itemsWithFullUrls);
+});
 router.put('/team-image/:id', upload.single('image'), async (req, res) => {
     const update = req.file ? { image: req.file.path } : {};
     res.json(await TeamImage.findByIdAndUpdate(req.params.id, update, { new: true }));
@@ -196,7 +204,15 @@ router.post('/partners', upload.single('image'), async (req, res) => {
     await item.save();
     res.json(item);
 });
-router.get('/partners', async (req, res) => res.json(await Partner.find()));
+router.get('/partners', async (req, res) => {
+    const items = await Partner.find();
+    // Map to include full URL for images
+    const itemsWithFullUrls = items.map(item => ({
+        ...item.toObject(),
+        image: getImageUrl(req, item.image)
+    }));
+    res.json(itemsWithFullUrls);
+});
 router.put('/partners/:id', upload.single('image'), async (req, res) => {
     const update = req.file ? { image: req.file.path } : {};
     res.json(await Partner.findByIdAndUpdate(req.params.id, update, { new: true }));
@@ -212,7 +228,15 @@ router.post('/header-hero', upload.single('image'), async (req, res) => {
     await item.save();
     res.json(item);
 });
-router.get('/header-hero', async (req, res) => res.json(await HeaderHero.find()));
+router.get('/header-hero', async (req, res) => {
+    const items = await HeaderHero.find();
+    // Map to include full URL for images
+    const itemsWithFullUrls = items.map(item => ({
+        ...item.toObject(),
+        image: getImageUrl(req, item.image)
+    }));
+    res.json(itemsWithFullUrls);
+});
 router.put('/header-hero/:id', upload.single('image'), async (req, res) => {
     const update = req.file ? { image: req.file.path } : {};
     res.json(await HeaderHero.findByIdAndUpdate(req.params.id, update, { new: true }));
@@ -229,7 +253,15 @@ router.post('/our-team', upload.single('image'), async (req, res) => {
     await item.save();
     res.json(item);
 });
-router.get('/our-team', async (req, res) => res.json(await OurTeam.find()));
+router.get('/our-team', async (req, res) => {
+    const items = await OurTeam.find();
+    // Map to include full URL for images
+    const itemsWithFullUrls = items.map(item => ({
+        ...item.toObject(),
+        image: getImageUrl(req, item.image)
+    }));
+    res.json(itemsWithFullUrls);
+});
 router.put('/our-team/:id', upload.single('image'), async (req, res) => {
     const update = req.body;
     if (req.body.socialLinks) update.socialLinks = req.body.socialLinks.split(',');

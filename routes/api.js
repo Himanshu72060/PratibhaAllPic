@@ -32,18 +32,46 @@ const getImageUrl = (req, filePath) => {
 
 /* === Header Logo === */
 router.post('/header-logo', upload.single('image'), async (req, res) => {
-    const item = new HeaderLogo({ image: req.file.path });
-    await item.save();
-    res.json(item);
+    try {
+        const item = new HeaderLogo({ image: getImageUrl(req, req.file.path) });
+        await item.save();
+        res.json(item);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
-router.get('/header-logo', async (req, res) => res.json(await HeaderLogo.find()));
+router.get('/header-logo', async (req, res) => {
+    try {
+        const items = await HeaderLogo.find();
+        // Map to include full URL for images
+        const itemsWithFullUrls = items.map(item => ({
+            ...item.toObject(),
+            image: getImageUrl(req, item.image)
+        }));
+        res.json(itemsWithFullUrls);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 router.put('/header-logo/:id', upload.single('image'), async (req, res) => {
-    const update = req.file ? { image: req.file.path } : {};
-    res.json(await HeaderLogo.findByIdAndUpdate(req.params.id, update, { new: true }));
+    try {
+        const update = req.file ? { image: getImageUrl(req, req.file.path) } : {};
+        const updatedItem = await HeaderLogo.findByIdAndUpdate(req.params.id, update, { new: true });
+        res.json({
+            ...updatedItem.toObject(),
+            image: getImageUrl(req, updatedItem.image) // Ensure full URL for image
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 router.delete('/header-logo/:id', async (req, res) => {
-    await HeaderLogo.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Deleted' });
+    try {
+        await HeaderLogo.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Deleted' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 /* === Courses === */
@@ -103,12 +131,15 @@ router.delete('/courses/:id', async (req, res) => {
 });
 
 /* === Events === */
+// ✅ POST - Create new event
 router.post('/events', upload.single('image'), async (req, res) => {
     const imageUrl = req.file ? getImageUrl(req, req.file.path) : null;
     const item = new Event({ ...req.body, image: imageUrl });
     await item.save();
     res.json(item);
 });
+
+// ✅ GET - All events
 router.get('/events', async (req, res) => {
     const events = await Event.find();
     // Map to include full URL for images
@@ -118,6 +149,7 @@ router.get('/events', async (req, res) => {
     }));
     res.json(eventsWithFullUrls);
 });
+// ✅ PUT - Update event
 router.put('/events/:id', upload.single('image'), async (req, res) => {
     const update = req.body;
     if (req.file) {
@@ -126,17 +158,30 @@ router.put('/events/:id', upload.single('image'), async (req, res) => {
     const updatedEvent = await Event.findByIdAndUpdate(req.params.id, update, { new: true });
     res.json(updatedEvent);
 });
+// ✅ DELETE - Remove event
 router.delete('/events/:id', async (req, res) => {
     await Event.findByIdAndDelete(req.params.id);
     res.json({ message: 'Deleted' });
 });
+
 /* === Gallery Header Image === */
 router.post('/gallery-header', upload.single('image'), async (req, res) => {
-    const item = new Gallery({ image: req.file.path });
+    const itemurl = req.file ? getImageUrl(req, req.file.path) : null;
+    const item = new Gallery({ image: itemurl });
     await item.save();
     res.json(item);
+}
+);
+// ✅ GET - All gallery header images
+router.get('/gallery-header', async (req, res) => {
+    const items = await Gallery.find();
+    // Map to include full URL for images
+    const itemsWithFullUrls = items.map(item => ({
+        ...item.toObject(),
+        image: getImageUrl(req, item.image)
+    }));
+    res.json(itemsWithFullUrls);
 });
-router.get('/gallery-header', async (req, res) => res.json(await Gallery.find()));
 router.put('/gallery-header/:id', upload.single('image'), async (req, res) => {
     const update = req.file ? { image: req.file.path } : {};
     res.json(await Gallery.findByIdAndUpdate(req.params.id, update, { new: true }));
@@ -147,9 +192,16 @@ router.delete('/gallery-header/:id', async (req, res) => {
 });
 /* === Gallery Images === */
 router.post('/gallery', upload.single('image'), async (req, res) => {
-    const item = new Gallery({ image: req.file.path });
-    await item.save();
-    res.json(item);
+    const item = req.file ? new Gallery({ image: req.file.path }) : null;
+    if (item) {
+        await item.save();
+        res.json({
+            ...item.toObject(),
+            image: getImageUrl(req, item.image)  // Ensure full URL for image
+        });
+    } else {
+        res.status(400).json({ error: 'Image file is required' });
+    }
 });
 router.get('/gallery', async (req, res) => {
     const items = await Gallery.find();
@@ -176,9 +228,16 @@ router.delete('/gallery/:id', async (req, res) => {
 
 /* === Team Image === */
 router.post('/team-image', upload.single('image'), async (req, res) => {
-    const item = new TeamImage({ image: req.file.path });
-    await item.save();
-    res.json(item);
+    const item = req.file ? new TeamImage({ image: req.file.path }) : null;
+    if (item) {
+        await item.save();
+        res.json({
+            ...item.toObject(),
+            image: getImageUrl(req, item.image)  // Ensure full URL for image
+        });
+    } else {
+        res.status(400).json({ error: 'Image file is required' });
+    }
 });
 router.get('/team-image', async (req, res) => {
     const items = await TeamImage.find();
@@ -200,9 +259,16 @@ router.delete('/team-image/:id', async (req, res) => {
 
 /* === Partner Image === */
 router.post('/partners', upload.single('image'), async (req, res) => {
-    const item = new Partner({ image: req.file.path });
-    await item.save();
-    res.json(item);
+    const item = req.file ? new Partner({ image: req.file.path }) : null;
+    if (item) {
+        await item.save();
+        res.json({
+            ...item.toObject(),
+            image: getImageUrl(req, item.image)  // Ensure full URL for image
+        });
+    } else {
+        res.status(400).json({ error: 'Image file is required' });
+    }
 });
 router.get('/partners', async (req, res) => {
     const items = await Partner.find();
@@ -224,9 +290,16 @@ router.delete('/partners/:id', async (req, res) => {
 
 /* === Header Hero === */
 router.post('/header-hero', upload.single('image'), async (req, res) => {
-    const item = new HeaderHero({ image: req.file.path });
-    await item.save();
-    res.json(item);
+    const item = req.file ? new HeaderHero({ image: req.file.path }) : null;
+    if (item) {
+        await item.save();
+        res.json({
+            ...item.toObject(),
+            image: getImageUrl(req, item.image)  // Ensure full URL for image
+        });
+    } else {
+        res.status(400).json({ error: 'Image file is required' });
+    }
 });
 router.get('/header-hero', async (req, res) => {
     const items = await HeaderHero.find();
@@ -248,10 +321,21 @@ router.delete('/header-hero/:id', async (req, res) => {
 
 /* === Our Team === */
 router.post('/our-team', upload.single('image'), async (req, res) => {
-    const socialLinks = req.body.socialLinks?.split(',') || [];
-    const item = new OurTeam({ ...req.body, image: req.file.path, socialLinks });
-    await item.save();
-    res.json(item);
+    const socialLinks = req.body.socialLinks ? req.body.socialLinks.split(',') : [];
+    const item = req.file ? new OurTeam({
+        name: req.body.name,
+        image: req.file.path,
+        socialLinks: socialLinks
+    }) : null;
+    if (item) {
+        await item.save();
+        res.json({
+            ...item.toObject(),
+            image: getImageUrl(req, item.image)  // Ensure full URL for image
+        });
+    } else {
+        res.status(400).json({ error: 'Image file is required' });
+    }
 });
 router.get('/our-team', async (req, res) => {
     const items = await OurTeam.find();

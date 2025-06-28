@@ -130,38 +130,49 @@ router.delete('/events/:id', async (req, res) => {
     await Event.findByIdAndDelete(req.params.id);
     res.json({ message: 'Deleted' });
 });
-
-router.post('/events', upload.single('image'), async (req, res) => {
-    const item = new Event({ ...req.body, image: req.file.path });
+/* === Gallery Header Image === */
+router.post('/gallery-header', upload.single('image'), async (req, res) => {
+    const item = new Gallery({ image: req.file.path });
     await item.save();
     res.json(item);
 });
-router.get('/events', async (req, res) => res.json(await Event.find()));
-router.put('/events/:id', upload.single('image'), async (req, res) => {
-    const update = req.body;
-    if (req.file) update.image = req.file.path;
-    res.json(await Event.findByIdAndUpdate(req.params.id, update, { new: true }));
+router.get('/gallery-header', async (req, res) => res.json(await Gallery.find()));
+router.put('/gallery-header/:id', upload.single('image'), async (req, res) => {
+    const update = req.file ? { image: req.file.path } : {};
+    res.json(await Gallery.findByIdAndUpdate(req.params.id, update, { new: true }));
 });
-router.delete('/events/:id', async (req, res) => {
-    await Event.findByIdAndDelete(req.params.id);
+router.delete('/gallery-header/:id', async (req, res) => {
+    await Gallery.findByIdAndDelete(req.params.id);
     res.json({ message: 'Deleted' });
 });
-
-/* === Gallery === */
+/* === Gallery Images === */
 router.post('/gallery', upload.single('image'), async (req, res) => {
     const item = new Gallery({ image: req.file.path });
     await item.save();
     res.json(item);
 });
-router.get('/gallery', async (req, res) => res.json(await Gallery.find()));
+router.get('/gallery', async (req, res) => {
+    const items = await Gallery.find();
+    // Map to include full URL for images
+    const itemsWithFullUrls = items.map(item => ({
+        ...item.toObject(),
+        image: getImageUrl(req, item.image)
+    }));
+    res.json(itemsWithFullUrls);
+});
 router.put('/gallery/:id', upload.single('image'), async (req, res) => {
     const update = req.file ? { image: req.file.path } : {};
-    res.json(await Gallery.findByIdAndUpdate(req.params.id, update, { new: true }));
+    const updatedItem = await Gallery.findByIdAndUpdate(req.params.id, update, { new: true });
+    res.json({
+        ...updatedItem.toObject(),
+        image: getImageUrl(req, updatedItem.image)  // Ensure full URL for image
+    });
 });
 router.delete('/gallery/:id', async (req, res) => {
     await Gallery.findByIdAndDelete(req.params.id);
     res.json({ message: 'Deleted' });
 });
+
 
 /* === Team Image === */
 router.post('/team-image', upload.single('image'), async (req, res) => {

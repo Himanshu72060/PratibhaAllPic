@@ -104,6 +104,34 @@ router.delete('/courses/:id', async (req, res) => {
 
 /* === Events === */
 router.post('/events', upload.single('image'), async (req, res) => {
+    const imageUrl = req.file ? getImageUrl(req, req.file.path) : null;
+    const item = new Event({ ...req.body, image: imageUrl });
+    await item.save();
+    res.json(item);
+});
+router.get('/events', async (req, res) => {
+    const events = await Event.find();
+    // Map to include full URL for images
+    const eventsWithFullUrls = events.map(event => ({
+        ...event.toObject(),
+        image: getImageUrl(req, event.image)
+    }));
+    res.json(eventsWithFullUrls);
+});
+router.put('/events/:id', upload.single('image'), async (req, res) => {
+    const update = req.body;
+    if (req.file) {
+        update.image = getImageUrl(req, req.file.path);
+    }
+    const updatedEvent = await Event.findByIdAndUpdate(req.params.id, update, { new: true });
+    res.json(updatedEvent);
+});
+router.delete('/events/:id', async (req, res) => {
+    await Event.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Deleted' });
+});
+
+router.post('/events', upload.single('image'), async (req, res) => {
     const item = new Event({ ...req.body, image: req.file.path });
     await item.save();
     res.json(item);

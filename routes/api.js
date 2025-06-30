@@ -42,8 +42,8 @@ router.post('/header-logo', upload.single('image'), async (req, res) => {
 });
 router.get('/header-logo', async (req, res) => {
     try {
-        const courses = await Course.find();
-        res.json(courses);
+        const items = await HeaderLogo.find();
+        res.json(items); // No image mapping, just raw data
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

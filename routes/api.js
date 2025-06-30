@@ -42,13 +42,8 @@ router.post('/header-logo', upload.single('image'), async (req, res) => {
 });
 router.get('/header-logo', async (req, res) => {
     try {
-        const items = await HeaderLogo.find();
-        // Map to include full URL for images
-        const itemsWithFullUrls = items.map(item => ({
-            ...item.toObject(),
-            image: getImageUrl(req, item.image)
-        }));
-        res.json(itemsWithFullUrls);
+        const courses = await Course.find();
+        res.json(courses);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

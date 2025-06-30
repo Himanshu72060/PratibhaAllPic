@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 require('dotenv').config();
-const upload = require('../utils/cloudinaryStorage'); // Import cloudinary multer
+const cloudinarycloudinaryUpload = require('../utils/cloudinaryStorage');
 
 
 // Models
@@ -18,13 +18,12 @@ const User = require('../models/User'); // ✅ Added
 
 // Multer Setup with filename cleaning
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, 'uploads/'),
+    destination: (req, file, cb) => cb(null, 'Uploads/'),
     filename: (req, file, cb) => {
         const cleaned = file.originalname.replace(/\s+/g, '-');
         cb(null, Date.now() + '-' + cleaned);
     }
 });
-const upload = multer({ storage });
 
 
 // Helper function to build full URL
@@ -33,7 +32,7 @@ const getImageUrl = (req, filePath) => {
 };
 
 /* === Header Logo === */
-router.post('/header-logo', upload.single('image'), async (req, res) => {
+router.post('/header-logo', cloudinaryUpload.single('image'), async (req, res) => {
     try {
         const item = new HeaderLogo({ image: getImageUrl(req, req.file.path) });
         await item.save();
@@ -55,7 +54,7 @@ router.get('/header-logo', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-router.put('/header-logo/:id', upload.single('image'), async (req, res) => {
+router.put('/header-logo/:id', cloudinaryUpload.single('image'), async (req, res) => {
     try {
         const update = req.file ? { image: getImageUrl(req, req.file.path) } : {};
         const updatedItem = await HeaderLogo.findByIdAndUpdate(req.params.id, update, { new: true });
@@ -78,7 +77,7 @@ router.delete('/header-logo/:id', async (req, res) => {
 
 /* === Courses === */
 // ✅ POST - Create new course
-router.post('/courses', upload.single('image'), async (req, res) => {
+router.post('/courses', cloudinaryUpload.single('image'), async (req, res) => {
     try {
         const imageUrl = req.file ? getImageUrl(req, req.file.path) : null;
 
@@ -107,7 +106,7 @@ router.get('/courses', async (req, res) => {
 });
 
 // ✅ PUT - Update course
-router.put('/courses/:id', upload.single('image'), async (req, res) => {
+router.put('/courses/:id', cloudinaryUpload.single('image'), async (req, res) => {
     try {
         const update = req.body;
 
@@ -134,7 +133,7 @@ router.delete('/courses/:id', async (req, res) => {
 
 /* === Events === */
 // ✅ POST - Create new event
-router.post('/events', upload.single('image'), async (req, res) => {
+router.post('/events', cloudinaryUpload.single('image'), async (req, res) => {
     const imageUrl = req.file ? getImageUrl(req, req.file.path) : null;
     const item = new Event({ ...req.body, image: imageUrl });
     await item.save();
@@ -152,7 +151,7 @@ router.get('/events', async (req, res) => {
     res.json(eventsWithFullUrls);
 });
 // ✅ PUT - Update event
-router.put('/events/:id', upload.single('image'), async (req, res) => {
+router.put('/events/:id', cloudinaryUpload.single('image'), async (req, res) => {
     const update = req.body;
     if (req.file) {
         update.image = getImageUrl(req, req.file.path);
@@ -167,7 +166,7 @@ router.delete('/events/:id', async (req, res) => {
 });
 
 /* === Gallery Header Image === */
-router.post('/gallery-header', upload.single('image'), async (req, res) => {
+router.post('/gallery-header', cloudinaryUpload.single('image'), async (req, res) => {
     const itemurl = req.file ? getImageUrl(req, req.file.path) : null;
     const item = new Gallery({ image: itemurl });
     await item.save();
@@ -184,7 +183,7 @@ router.get('/gallery-header', async (req, res) => {
     }));
     res.json(itemsWithFullUrls);
 });
-router.put('/gallery-header/:id', upload.single('image'), async (req, res) => {
+router.put('/gallery-header/:id', cloudinaryUpload.single('image'), async (req, res) => {
     const update = req.file ? { image: req.file.path } : {};
     res.json(await Gallery.findByIdAndUpdate(req.params.id, update, { new: true }));
 });
@@ -193,7 +192,7 @@ router.delete('/gallery-header/:id', async (req, res) => {
     res.json({ message: 'Deleted' });
 });
 /* === Gallery Images === */
-router.post('/gallery', upload.single('image'), async (req, res) => {
+router.post('/gallery', cloudinaryUpload.single('image'), async (req, res) => {
     const item = req.file ? new Gallery({ image: req.file.path }) : null;
     if (item) {
         await item.save();
@@ -214,7 +213,7 @@ router.get('/gallery', async (req, res) => {
     }));
     res.json(itemsWithFullUrls);
 });
-router.put('/gallery/:id', upload.single('image'), async (req, res) => {
+router.put('/gallery/:id', cloudinaryUpload.single('image'), async (req, res) => {
     const update = req.file ? { image: req.file.path } : {};
     const updatedItem = await Gallery.findByIdAndUpdate(req.params.id, update, { new: true });
     res.json({
@@ -229,7 +228,7 @@ router.delete('/gallery/:id', async (req, res) => {
 
 
 /* === Team Image === */
-router.post('/team-image', upload.single('image'), async (req, res) => {
+router.post('/team-image', cloudinaryUpload.single('image'), async (req, res) => {
     const item = req.file ? new TeamImage({ image: req.file.path }) : null;
     if (item) {
         await item.save();
@@ -250,7 +249,7 @@ router.get('/team-image', async (req, res) => {
     }));
     res.json(itemsWithFullUrls);
 });
-router.put('/team-image/:id', upload.single('image'), async (req, res) => {
+router.put('/team-image/:id', cloudinaryUpload.single('image'), async (req, res) => {
     const update = req.file ? { image: req.file.path } : {};
     res.json(await TeamImage.findByIdAndUpdate(req.params.id, update, { new: true }));
 });
@@ -260,7 +259,7 @@ router.delete('/team-image/:id', async (req, res) => {
 });
 
 /* === Partner Image === */
-router.post('/partners', upload.single('image'), async (req, res) => {
+router.post('/partners', cloudinaryUpload.single('image'), async (req, res) => {
     const item = req.file ? new Partner({ image: req.file.path }) : null;
     if (item) {
         await item.save();
@@ -281,7 +280,7 @@ router.get('/partners', async (req, res) => {
     }));
     res.json(itemsWithFullUrls);
 });
-router.put('/partners/:id', upload.single('image'), async (req, res) => {
+router.put('/partners/:id', cloudinaryUpload.single('image'), async (req, res) => {
     const update = req.file ? { image: req.file.path } : {};
     res.json(await Partner.findByIdAndUpdate(req.params.id, update, { new: true }));
 });
@@ -291,7 +290,7 @@ router.delete('/partners/:id', async (req, res) => {
 });
 
 /* === Header Hero === */
-router.post('/header-hero', upload.single('image'), async (req, res) => {
+router.post('/header-hero', cloudinaryUpload.single('image'), async (req, res) => {
     const item = req.file ? new HeaderHero({ image: req.file.path }) : null;
     if (item) {
         await item.save();
@@ -312,7 +311,7 @@ router.get('/header-hero', async (req, res) => {
     }));
     res.json(itemsWithFullUrls);
 });
-router.put('/header-hero/:id', upload.single('image'), async (req, res) => {
+router.put('/header-hero/:id', cloudinaryUpload.single('image'), async (req, res) => {
     const update = req.file ? { image: req.file.path } : {};
     res.json(await HeaderHero.findByIdAndUpdate(req.params.id, update, { new: true }));
 });
@@ -322,7 +321,7 @@ router.delete('/header-hero/:id', async (req, res) => {
 });
 
 /* === Our Team === */
-router.post('/our-team', upload.single('image'), async (req, res) => {
+router.post('/our-team', cloudinaryUpload.single('image'), async (req, res) => {
     const socialLinks = req.body.socialLinks ? req.body.socialLinks.split(',') : [];
     const item = req.file ? new OurTeam({
         name: req.body.name,
@@ -348,7 +347,7 @@ router.get('/our-team', async (req, res) => {
     }));
     res.json(itemsWithFullUrls);
 });
-router.put('/our-team/:id', upload.single('image'), async (req, res) => {
+router.put('/our-team/:id', cloudinaryUpload.single('image'), async (req, res) => {
     const update = req.body;
     if (req.body.socialLinks) update.socialLinks = req.body.socialLinks.split(',');
     if (req.file) update.image = req.file.path;

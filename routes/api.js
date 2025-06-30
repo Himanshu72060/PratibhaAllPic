@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 require('dotenv').config();
+const upload = require('../utils/cloudinaryStorage'); // Import cloudinary multer
+
 
 // Models
 const Course = require('../models/Course');

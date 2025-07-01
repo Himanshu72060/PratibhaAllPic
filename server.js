@@ -13,6 +13,7 @@ const app = express();
 const routes = require('./routes/api');
 const serviceRoutes = require('./routes/serviceRoutes');
 const aboutRoutes = require('./routes/aboutRoutes');
+const contactRoutes = require('./routes/contactRoutes');
 
 
 
@@ -46,6 +47,8 @@ app.use('/uploads', express.static('uploads'));
 // ✅ API Routes
 app.use('/api/about', aboutRoutes);
 app.use('/api/services', serviceRoutes);
+app.use('/api/contacts', contactRoutes);
+
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use('/public', express.static(path.join(__dirname, "public")));

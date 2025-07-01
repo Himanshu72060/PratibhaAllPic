@@ -12,6 +12,8 @@ dotenv.config();
 const app = express();
 const routes = require('./routes/api');
 const serviceRoutes = require('./routes/serviceRoutes');
+const aboutRoutes = require('./routes/aboutRoutes');
+
 
 
 // ✅ Allow multiple frontend origins
@@ -40,6 +42,9 @@ app.use(express.json());
 // ✅ Serve uploads folder as static
 const uploadsPath = path.join(__dirname, 'uploads');
 app.use('/uploads', express.static('uploads'));
+
+// ✅ API Routes
+app.use('/api/about', aboutRoutes);
 app.use('/api/services', serviceRoutes);
 
 app.use(express.static(path.join(__dirname, "public")));

@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
 const EventSchema = new mongoose.Schema({
-    image: String,
+    date: String,
     name: String,
-    date: String
+    coverImage: [String] // array of image URLs/paths
 });
 
 module.exports = mongoose.model('Event', EventSchema);

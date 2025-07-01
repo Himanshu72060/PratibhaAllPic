@@ -127,32 +127,53 @@ router.delete('/courses/:id', async (req, res) => {
 
 /* === Events === */
 // ✅ POST - Create new event
-router.post('/events', upload.single('image'), async (req, res) => {
-    const imageUrl = req.file ? getImageUrl(req, req.file.path) : null;
-    const item = new Event({ ...req.body, image: imageUrl });
-    await item.save();
-    res.json(item);
+router.post('/events', upload.array('coverImage'), async (req, res) => {
+    try {
+        const coverImages = req.files ? req.files.map(file => getImageUrl(req, file.path)) : [];
+        const item = new Event({
+            ...req.body,
+            coverImage: coverImages
+        });
+        await item.save();
+        res.json(item);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
-// ✅ GET - All events
+//  ✅ GET - All events
 router.get('/events', async (req, res) => {
-    const events = await Event.find();
-    // Map to include full URL for images
-    const eventsWithFullUrls = events.map(event => ({
-        ...event.toObject(),
-        image: getImageUrl(req, event.image)
-    }));
-    res.json(eventsWithFullUrls);
-});
-// ✅ PUT - Update event
-router.put('/events/:id', upload.single('image'), async (req, res) => {
-    const update = req.body;
-    if (req.file) {
-        update.image = getImageUrl(req, req.file.path);
+    try {
+        const events = await Event.find();
+        // Map to include full URL for cover images
+        const eventsWithFullUrls = events.map(event => ({
+            ...event.toObject(),
+            coverImage: event.coverImage.map(image => getImageUrl(req, image))
+        }));
+        res.json(eventsWithFullUrls);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
-    const updatedEvent = await Event.findByIdAndUpdate(req.params.id, update, { new: true });
-    res.json(updatedEvent);
 });
+
+// ✅ PUT - Update event
+router.put('/events/:id', upload.array('coverImage', 5), async (req, res) => {
+    try {
+        const update = req.body;
+        if (req.files && req.files.length > 0) {
+            update.coverImage = req.files.map(file => getImageUrl(req, file.path));
+        }
+
+        const updatedEvent = await Event.findByIdAndUpdate(req.params.id, update, { new: true });
+        res.json({
+            ...updatedEvent.toObject(),
+            coverImage: updatedEvent.coverImage.map(image => getImageUrl(req, image)) // Ensure full URL for images
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }   
+});
+
 // ✅ DELETE - Remove event
 router.delete('/events/:id', async (req, res) => {
     await Event.findByIdAndDelete(req.params.id);

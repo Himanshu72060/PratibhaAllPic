@@ -6,7 +6,6 @@ require('dotenv').config();
 // Models
 const Course = require('../models/Course');
 const Event = require('../models/Event');
-const Gallery = require('../models/Gallery');
 const HeaderLogo = require('../models/HeaderLogo');
 const HeaderHero = require('../models/HeaderHero');
 const OurTeam = require('../models/OurTeam');
@@ -177,33 +176,6 @@ router.put('/events/:id', upload.array('coverImage', 5), async (req, res) => {
 // ✅ DELETE - Remove event
 router.delete('/events/:id', async (req, res) => {
     await Event.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Deleted' });
-});
-
-/* === Gallery Header Image === */
-router.post('/gallery-header', upload.single('image'), async (req, res) => {
-    const itemurl = req.file ? getImageUrl(req, req.file.path) : null;
-    const item = new Gallery({ image: itemurl });
-    await item.save();
-    res.json(item);
-}
-);
-// ✅ GET - All gallery header images
-router.get('/gallery-header', async (req, res) => {
-    const items = await Gallery.find();
-    // Map to include full URL for images
-    const itemsWithFullUrls = items.map(item => ({
-        ...item.toObject(),
-        image: getImageUrl(req, item.image)
-    }));
-    res.json(itemsWithFullUrls);
-});
-router.put('/gallery-header/:id', upload.single('image'), async (req, res) => {
-    const update = req.file ? { image: req.file.path } : {};
-    res.json(await Gallery.findByIdAndUpdate(req.params.id, update, { new: true }));
-});
-router.delete('/gallery-header/:id', async (req, res) => {
-    await Gallery.findByIdAndDelete(req.params.id);
     res.json({ message: 'Deleted' });
 });
 

@@ -22,10 +22,9 @@ const partnerRoutes = require('./routes/partnerRoutes');
 // ✅ Allow multiple frontend origins
 const allowedOrigins = [
     'http://localhost:3000',
-    'https://image-api-nmwn.onrender.com',
-    'https://your-frontend.onrender.com' // 🔁 replace this with actual frontend URL
+    'https://pite-fawn.vercel.app',
+    'https://pratibhaallpic.onrender.com'
 ];
-
 // ✅ Proper CORS setup
 app.use(cors({
     origin: function (origin, callback) {

@@ -206,41 +206,6 @@ router.delete('/gallery-header/:id', async (req, res) => {
     await Gallery.findByIdAndDelete(req.params.id);
     res.json({ message: 'Deleted' });
 });
-/* === Gallery Images === */
-router.post('/gallery', upload.single('image'), async (req, res) => {
-    const item = req.file ? new Gallery({ image: req.file.path }) : null;
-    if (item) {
-        await item.save();
-        res.json({
-            ...item.toObject(),
-            image: getImageUrl(req, item.image)  // Ensure full URL for image
-        });
-    } else {
-        res.status(400).json({ error: 'Image file is required' });
-    }
-});
-router.get('/gallery', async (req, res) => {
-    const items = await Gallery.find();
-    // Map to include full URL for images
-    const itemsWithFullUrls = items.map(item => ({
-        ...item.toObject(),
-        image: getImageUrl(req, item.image)
-    }));
-    res.json(itemsWithFullUrls);
-});
-router.put('/gallery/:id', upload.single('image'), async (req, res) => {
-    const update = req.file ? { image: req.file.path } : {};
-    const updatedItem = await Gallery.findByIdAndUpdate(req.params.id, update, { new: true });
-    res.json({
-        ...updatedItem.toObject(),
-        image: getImageUrl(req, updatedItem.image)  // Ensure full URL for image
-    });
-});
-router.delete('/gallery/:id', async (req, res) => {
-    await Gallery.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Deleted' });
-});
-
 
 /* === Team Image === */
 router.post('/team-image', upload.single('image'), async (req, res) => {
@@ -270,37 +235,6 @@ router.put('/team-image/:id', upload.single('image'), async (req, res) => {
 });
 router.delete('/team-image/:id', async (req, res) => {
     await TeamImage.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Deleted' });
-});
-
-/* === Partner Image === */
-router.post('/partners', upload.single('image'), async (req, res) => {
-    const item = req.file ? new Partner({ image: req.file.path }) : null;
-    if (item) {
-        await item.save();
-        res.json({
-            ...item.toObject(),
-            image: getImageUrl(req, item.image)  // Ensure full URL for image
-        });
-    } else {
-        res.status(400).json({ error: 'Image file is required' });
-    }
-});
-router.get('/partners', async (req, res) => {
-    const items = await Partner.find();
-    // Map to include full URL for images
-    const itemsWithFullUrls = items.map(item => ({
-        ...item.toObject(),
-        image: getImageUrl(req, item.image)
-    }));
-    res.json(itemsWithFullUrls);
-});
-router.put('/partners/:id', upload.single('image'), async (req, res) => {
-    const update = req.file ? { image: req.file.path } : {};
-    res.json(await Partner.findByIdAndUpdate(req.params.id, update, { new: true }));
-});
-router.delete('/partners/:id', async (req, res) => {
-    await Partner.findByIdAndDelete(req.params.id);
     res.json({ message: 'Deleted' });
 });
 

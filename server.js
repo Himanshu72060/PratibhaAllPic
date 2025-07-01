@@ -14,6 +14,8 @@ const routes = require('./routes/api');
 const serviceRoutes = require('./routes/serviceRoutes');
 const aboutRoutes = require('./routes/aboutRoutes');
 const contactRoutes = require('./routes/contactRoutes');
+const blogRoutes = require('./routes/blogRoutes');
+const partnerRoutes = require('./routes/partnerRoutes');
 
 
 
@@ -48,6 +50,10 @@ app.use('/uploads', express.static('uploads'));
 app.use('/api/about', aboutRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/contacts', contactRoutes);
+app.use('/api/blogs', blogRoutes);
+app.use('/api/partners', partnerRoutes);
+
+
 
 
 app.use(express.static(path.join(__dirname, "public")));

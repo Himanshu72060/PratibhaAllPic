@@ -5,9 +5,14 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const dotenv = require('dotenv');
 
+
+dotenv.config();
 const app = express();
 const routes = require('./routes/api');
+const serviceRoutes = require('./routes/serviceRoutes');
+
 
 // ✅ Allow multiple frontend origins
 const allowedOrigins = [
@@ -35,6 +40,7 @@ app.use(express.json());
 // ✅ Serve uploads folder as static
 const uploadsPath = path.join(__dirname, 'uploads');
 app.use('/uploads', express.static('uploads'));
+app.use('/api/services', serviceRoutes);
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use('/public', express.static(path.join(__dirname, "public")));
@@ -42,7 +48,7 @@ app.use('/public', express.static(path.join(__dirname, "public")));
 // ✅ Ensure uploads folder exists
 if (!fs.existsSync(uploadsPath)) {
     fs.mkdirSync(uploadsPath, { recursive: true });
-    console.log("✅ 'uploads' folder created");  
+    console.log("✅ 'uploads' folder created");
 } else {
     console.log("✅ 'uploads' folder already exists");
 }

@@ -171,7 +171,7 @@ router.put('/events/:id', upload.array('coverImage', 5), async (req, res) => {
         });
     } catch (err) {
         res.status(500).json({ error: err.message });
-    }   
+    }
 });
 
 // ✅ DELETE - Remove event

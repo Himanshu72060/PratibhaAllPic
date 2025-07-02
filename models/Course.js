@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const CourseSchema = new mongoose.Schema({
+const nestedCourseSchema = new mongoose.Schema({
     image: String,
     title: String,
     description: String,
@@ -10,4 +10,10 @@ const CourseSchema = new mongoose.Schema({
     liveClassLink: String
 });
 
-module.exports = mongoose.model('Course', CourseSchema);
+const courseSchema = new mongoose.Schema({
+    name: String,
+    image: String,
+    courses: [nestedCourseSchema]
+});
+
+module.exports = mongoose.model('Course', courseSchema);

@@ -16,7 +16,7 @@ const aboutRoutes = require('./routes/aboutRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const blogRoutes = require('./routes/blogRoutes');
 const partnerRoutes = require('./routes/partnerRoutes');
-
+const courseRoutes = require('./routes/courseRoutes');
 
 
 // ✅ Allow multiple frontend origins
@@ -51,6 +51,8 @@ app.use('/api/services', serviceRoutes);
 app.use('/api/contacts', contactRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/partners', partnerRoutes);
+app.use('/api/courses', courseRoutes);
+
 
 
 

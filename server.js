@@ -17,6 +17,7 @@ const contactRoutes = require('./routes/contactRoutes');
 const blogRoutes = require('./routes/blogRoutes');
 const partnerRoutes = require('./routes/partnerRoutes');
 const courseRoutes = require('./routes/courseRoutes');
+const studentZoneRoutes = require('./routes/studentZone');
 
 
 // ✅ Allow multiple frontend origins
@@ -52,6 +53,8 @@ app.use('/api/contacts', contactRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/partners', partnerRoutes);
 app.use('/api/courses', courseRoutes);
+app.use('/api/student-zone', studentZoneRoutes);
+
 
 
 
